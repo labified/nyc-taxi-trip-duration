@@ -1,3 +1,4 @@
 {
-  "python.pythonPath": "C:\\Users\\andre\\Anaconda3\\envs\\genml\\python.exe"
+  "python.pythonPath": "C:\\Users\\andre\\Anaconda3\\envs\\genml\\python.exe",
+  "python.linting.pylintEnabled": true,
 }
