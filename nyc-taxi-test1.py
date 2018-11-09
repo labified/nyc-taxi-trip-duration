@@ -10,5 +10,5 @@ from preprocess import Preprocess
 train = pd.read_csv('./data/train_with_routes.csv')
 
 plt.figure(figsize=[15, 8])
-plt.scatter(train['pickup_longitude'], train['pickup_latitude'], s=1)
+plt.scatter(np.arange(0, len(train)), train['pickup_longitude'], s=1)
 plt.show()
