@@ -5,11 +5,10 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import KFold
 
 from keras.models import Sequential
 from keras.layers import Dense
+from keras.layers import BatchNormalization
 from keras.wrappers.scikit_learn import KerasRegressor
 from keras.callbacks import TensorBoard
 
@@ -19,6 +18,7 @@ from preprocess import Preprocess
 def baseline_model():
   model = Sequential()
   model.add(Dense(units=1, input_dim=1, activation='relu', kernel_initializer='normal'))
+  #model.add(BatchNormalization())
   model.add(Dense(units=1, kernel_initializer='normal'))
   model.compile(loss='mean_squared_error', optimizer='adam')
   return model
@@ -35,21 +35,14 @@ trips = (
     .add_epoch()
     .transform()
 )
-trips = trips.loc[:1000]
-X = trips[['Total_distance']]
-y = trips['trip_duration']
+X = trips[['Total_distance']].values
+y = trips['trip_duration'].values
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.33, random_state=42)
 
-pipeline = make_pipeline(
-  StandardScaler(),
-  KerasRegressor(build_fn=baseline_model, epochs=100, batch_size=5, verbose=0)
-)
-tensorboard = TensorBoard(log_dir='./graph', histogram_freq=0, write_graph=True, write_images=True)
-#seed = 7
-#np.random.seed(seed)
-#kfold = KFold(n_splits=10, random_state=seed)
-#results = cross_val_score(pipeline, X_train, y_train, cv=kfold, error_score='raise')
-#print("Results: %.2f (%.2f) MSE" % (results.mean(), results.std()))
-pipeline.set_params(kerasregressor__callbacks=[tensorboard])
-model = pipeline.fit(X_train, y_train)
-rmsle(model.predict(X_test), y_test)
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train, y_train)
+tensorboard = TensorBoard(log_dir='./data', histogram_freq=0, write_graph=True, write_images=True)
+estimator = KerasRegressor(build_fn=baseline_model)
+model = estimator.fit(X_train_scaled, y_train, verbose=1, callbacks=[tensorboard])
+
+rmsle(estimator.predict(scaler.transform(X_test)), y_test)
