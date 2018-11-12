@@ -105,4 +105,8 @@ venv.bak/
 
 data
 .vscode/settings.json
+<<<<<<< HEAD
 .DS_Store
+=======
+graph
+>>>>>>> fb4923dcaa2d654b537f6822f50ffc3881054d4c
